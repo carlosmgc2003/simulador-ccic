@@ -1,6 +1,7 @@
 import random
-from . import Actor
 from collections import namedtuple
+
+from . import Actor
 
 Metadata = namedtuple('Metadata', ['nro_mensaje', 'clasif_seg', 'precedencia', 'es_cifrado'])
 
@@ -19,7 +20,8 @@ class MensajeMilitar(Actor, dict):
 
     def __str__(self):
         """Representación cuando se hace print, legible para el humano."""
-        return super().__str__() + " " + f'Nro MM: {self.metadata.nro_mensaje}, clasif_seg: {self.metadata.clasif_seg}, precedencia: {self.metadata.precedencia}'
+        return super().__str__() + " " + f'Nro MM: {self.metadata.nro_mensaje}, clasif_seg: ' \
+                                         f'{self.metadata.clasif_seg}, precedencia: {self.metadata.precedencia}'
 
     # TODO: que el mensaje guarde su trazabilidad en el atributo trace
 
@@ -33,22 +35,25 @@ class GeneradorMensajes:
     def __init__(self):
         pass
 
-    def generar_mensaje(self):
+    def generar_mensaje(self) -> MensajeMilitar:
         """Método que genera un mensaje cuyo contenido es aleatorio"""
         nueva_clasif_seg = self.generar_clasif_seg()
         nueva_precedencia = self.generar_precedencia()
         nuevo_cifrado = self.determinar_cifrado(nueva_clasif_seg)
         return MensajeMilitar(nueva_clasif_seg, nueva_precedencia, nuevo_cifrado)
 
-    def generar_clasif_seg(self):
+    @staticmethod
+    def generar_clasif_seg():
         """Elige al azar (equiprobable) alguna de las clasificaciones de seguridad"""
         return random.choice(GeneradorMensajes.clasificaciones)
 
-    def generar_precedencia(self):
+    @staticmethod
+    def generar_precedencia():
         """Elige al azar (equiprobable) alguna de las precedencias"""
         return random.choice(GeneradorMensajes.precedencias)
 
-    def determinar_cifrado(self, clasif_seg):
+    @staticmethod
+    def determinar_cifrado(clasif_seg):
         """Elige al azar (equiprobable) si el mensaje es cifrado o no entre aquellos cuya clasificacion de seguridad
         es acorde."""
         if clasif_seg in "confidencial secreto".split():

@@ -2,6 +2,7 @@ import uuid
 
 
 class Actor:
+    """Clase abstracta que representa a todos los objetos de modelo que participan de la simulación"""
     def __init__(self, name: str):
         if len(name) > 0:
             self.name = name
