@@ -1,6 +1,4 @@
-from typing import List
-
-from model import Actor, MensajeMilitar
+from model import *
 
 
 class Facilidad(Actor):

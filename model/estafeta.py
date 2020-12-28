@@ -1,5 +1,3 @@
-from typing import List
-
 import simpy
 from scipy.stats import norm
 

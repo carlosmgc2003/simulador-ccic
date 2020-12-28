@@ -14,4 +14,3 @@ if __name__ == '__main__':
         print(mensaje)
     logging.info("Finalizó el programa")
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
