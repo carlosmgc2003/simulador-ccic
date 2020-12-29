@@ -1,9 +1,12 @@
 import uuid
 
+import simpy
+
 
 class Actor:
     """Clase abstracta que representa a todos los objetos de modelo que participan de la simulación"""
-    def __init__(self, name: str):
+    def __init__(self, name: str, environment: simpy.Environment):
+        self.environment = environment
         if len(name) > 0:
             self.name = name
         else:

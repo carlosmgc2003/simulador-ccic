@@ -1,17 +1,14 @@
 import random
 from collections import namedtuple
 
-from . import Actor
-
 Metadata = namedtuple('Metadata', ['nro_mensaje', 'clasif_seg', 'precedencia', 'es_cifrado'])
 
 
-class MensajeMilitar(Actor, dict):
+class MensajeMilitar(dict):
     """Clase que modela un mensaje militar. Las manos por las que pasa el mensaje se guarada en el atributo trace"""
     nro_inicial = 0
 
     def __init__(self, clasif_seg, precedencia, es_cifrado):
-        super(MensajeMilitar, self).__init__(name="Mensaje Militar")
         self.metadata = Metadata(clasif_seg=clasif_seg, nro_mensaje=MensajeMilitar.nro_inicial + 1,
                                  precedencia=precedencia, es_cifrado=es_cifrado)
         self.trace = []
@@ -20,8 +17,10 @@ class MensajeMilitar(Actor, dict):
 
     def __str__(self):
         """Representación cuando se hace print, legible para el humano."""
-        return super().__str__() + " " + f'Nro MM: {self.metadata.nro_mensaje}, clasif_seg: ' \
-                                         f'{self.metadata.clasif_seg}, precedencia: {self.metadata.precedencia}'
+        return f'Nro MM: {self.metadata.nro_mensaje}, clasif_seg: ' \
+                                         f'{self.metadata.clasif_seg}, ' \
+               f'precedencia: {self.metadata.precedencia}, ' \
+               f'destino: {self.destino}'
 
     # TODO: que el mensaje guarde su trazabilidad en el atributo trace
 
