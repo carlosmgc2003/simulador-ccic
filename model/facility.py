@@ -14,7 +14,13 @@ class Facilidad(Actor):
         self.bandeja_salida: List[MensajeMilitar] = []
 
     def recibir_mm(self, estafeta):
-        pass
+        for mensaje in estafeta.bolsa_mensajes:
+            if mensaje.destino == self.name:
+                self.bandeja_entrada.append(estafeta.entregar_mensaje(mensaje))
+                print(f'{self.name} RECIBIDO: {mensaje}')
 
     def entregar_mm(self, estafeta):
-        pass
+        for mensaje in self.bandeja_salida:
+            if mensaje.destino in list(map(lambda x: x.name, estafeta.recorrido)):
+                self.bandeja_salida.remove(estafeta.recoger_mensaje(mensaje))
+                print(f'{self.name} ENTREGADO: {mensaje}')

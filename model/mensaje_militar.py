@@ -13,14 +13,16 @@ class MensajeMilitar(dict):
                                  precedencia=precedencia, es_cifrado=es_cifrado)
         self.trace = []
         self.destino = ""  # Proximo destino interno al que debe ir el MM
+        self.procedencia = ""
         MensajeMilitar.nro_inicial += 1
 
     def __str__(self):
         """Representación cuando se hace print, legible para el humano."""
         return f'Nro MM: {self.metadata.nro_mensaje}, clasif_seg: ' \
-                                         f'{self.metadata.clasif_seg}, ' \
+               f'{self.metadata.clasif_seg}, ' \
                f'precedencia: {self.metadata.precedencia}, ' \
-               f'destino: {self.destino}'
+               f'destino: {self.destino}, ' \
+               f'procedencia: {self.procedencia}'
 
     # TODO: que el mensaje guarde su trazabilidad en el atributo trace
 

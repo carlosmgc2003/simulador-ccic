@@ -1,6 +1,6 @@
-from . import GeneradorMensajes
-from .estafeta import Estafeta
-from .facility import Facilidad
+from model import DESTINO_PROC_MM
+from model.facility import Facilidad
+from model.mensaje_militar import GeneradorMensajes
 
 
 class PuestoComando(Facilidad):
@@ -12,22 +12,11 @@ class PuestoComando(Facilidad):
 
     def generar_mm(self):
         nuevo_mm_saliente = self.comandante.generar_mensaje()
-        nuevo_mm_saliente.destino = "Centro de Mensajes"
+        nuevo_mm_saliente.destino = DESTINO_PROC_MM
+        nuevo_mm_saliente.procedencia = self.name
         self.bandeja_salida.append(nuevo_mm_saliente)
-        print("mensaje generado")
         yield self.environment.timeout(5)
 
-    def recibir_mm(self, estafeta: Estafeta):
-        for mensaje in estafeta.bolsa_mensajes:
-            if mensaje.destino == self.name:
-                self.bandeja_entrada.append(estafeta.entregar_mensaje(mensaje))
-                print("Mensaje recibido del estafeta")
-
-    def entregar_mm(self, estafeta: Estafeta):
-        for mensaje in self.bandeja_salida:
-            if mensaje.destino in list(map(lambda x: x.name, estafeta.recorrido)):
-                self.bandeja_salida.remove(estafeta.recoger_mensaje(mensaje))
-                print("Mensaje entregado al estafeta")
 
     def operar(self):
         while True:

@@ -1,6 +1,2 @@
-from .actor import *
-from .facility import *
-from .mensaje_militar import *
-from .puesto_comando import *
-from .estafeta import *
-from .centro_mensajes import *
+DESTINO_PROC_MM = "Centro de Mensajes"
+PUESTO_COMANDO = "Puesto Comando"

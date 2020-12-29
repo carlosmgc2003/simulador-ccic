@@ -1,10 +1,12 @@
+import random
 from typing import List
 
 import simpy
 from scipy.stats import norm
 
-from model import *
+from model.actor import Actor
 from model.facility import Facilidad
+from model.mensaje_militar import MensajeMilitar
 
 
 class Estafeta(Actor):
@@ -34,10 +36,17 @@ class Estafeta(Actor):
     def operar(self):
         while True:
             for facilidad in self.recorrido:
-                print(f'Visitando: {facilidad.name}')
-                facilidad.recibir_mm(self)
+                print(f'{self.name}: Visitando: {facilidad.name}')
                 facilidad.entregar_mm(self)
+                facilidad.recibir_mm(self)
+                print(f'{self.name}: Bolsa:')
+                self.imprimir_bolda()
                 yield self.environment.timeout(self.generar_t_recorrido())
+
+    def imprimir_bolda(self):
+        for mensaje in self.bolsa_mensajes:
+            print(mensaje)
+        print('---------------------------')
 
 
 class EstafetaNormal(Estafeta):
