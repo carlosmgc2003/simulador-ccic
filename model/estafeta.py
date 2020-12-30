@@ -36,14 +36,17 @@ class Estafeta(Actor):
     def operar(self):
         while True:
             for facilidad in self.recorrido:
-                print(f'{self.name}: Visitando: {facilidad.name}')
-                facilidad.entregar_mm(self)
-                facilidad.recibir_mm(self)
-                print(f'{self.name}: Bolsa:')
-                self.imprimir_bolda()
-                yield self.environment.timeout(self.generar_t_recorrido())
+                with facilidad.escribiente.request() as req:
+                    yield req
+                    print(f'{self.name}: Visitando: {facilidad.name}')
+                    facilidad.entregar_mm(self)
+                    facilidad.recibir_mm(self)
+                    yield self.environment.timeout(2)  # Tiempo que toma hablar con el escribiente
+                    print(f'{self.name}: Bolsa:')
+                    self.imprimir_bolsa()
+                    yield self.environment.timeout(self.generar_t_recorrido())
 
-    def imprimir_bolda(self):
+    def imprimir_bolsa(self):
         for mensaje in self.bolsa_mensajes:
             print(mensaje)
         print('---------------------------')

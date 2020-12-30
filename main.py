@@ -12,7 +12,6 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S
 if __name__ == '__main__':
     logging.info("Inició el programa")
     environment = simpy.Environment()
-
     pc = PuestoComando(environment)
     rtef1 = GrupoRTD(environment, "Cdo Op")
     rtef2 = GrupoRTD(environment, "Mat Pers")
@@ -31,7 +30,7 @@ if __name__ == '__main__':
     environment.process(rtef3.operar())
     environment.process(rtef4.operar())
     environment.process(rtef5.operar())
-    environment.run(until=30)
+    environment.run(until=60)
     for mensaje in pc.bandeja_entrada:
         print(mensaje)
     logging.info("Finalizó el programa")
