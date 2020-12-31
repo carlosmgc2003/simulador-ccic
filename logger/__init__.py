@@ -1,0 +1,2 @@
+INFLUX_DB_TOKEN = "ckKjCgKCVLSQBZRjM-sX15JmgbQsLCK5ArGJ9ZSr4QWi7jbyOwjkow1HR2I_WZmKurmmJ4zLz-d1P1AqfR_EEQ=="
+INFLUX_DB_URL = "http://localhost:8086"

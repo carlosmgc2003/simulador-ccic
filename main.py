@@ -2,6 +2,7 @@ import logging
 
 import simpy
 
+from logger.logger import influxdb_logger
 from model.centro_mensajes import CentroMensajes
 from model.estafeta import EstafetaUniforme
 from model.grupo_rtd import GrupoRTD
@@ -11,6 +12,11 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S
 
 if __name__ == '__main__':
     logging.info("Inició el programa")
+    org = "ccic"
+    bucket = "eventos-ccic"
+
+    write_api = influxdb_logger()
+
     environment = simpy.Environment()
     pc = PuestoComando(environment)
     rtef1 = GrupoRTD(environment, "Cdo Op")
