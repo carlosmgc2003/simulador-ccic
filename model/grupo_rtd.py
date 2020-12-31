@@ -1,5 +1,7 @@
 import random
 
+from influxdb_client import WriteApi
+
 from model import DESTINO_PROC_MM
 from model.facility import Facilidad
 from model.mensaje_militar import GeneradorMensajes
@@ -8,8 +10,8 @@ from model.mensaje_militar import GeneradorMensajes
 class GrupoRTD(Facilidad):
     """Cabina de radio transmision de datos que recibe los mensajes salientes del CCIC y los transmite y genera los mensajes entrantes."""
 
-    def __init__(self, environment, red: str):
-        super(GrupoRTD, self).__init__(name="Red " + red, environment=environment)
+    def __init__(self, environment, red: str, db_connection: WriteApi):
+        super(GrupoRTD, self).__init__(name="Red " + red, environment=environment, db_connection=db_connection)
         self.operador = GeneradorMensajes()
 
     def generar_mm(self):

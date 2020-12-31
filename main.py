@@ -4,7 +4,7 @@ import simpy
 
 from logger.logger import influxdb_logger
 from model.centro_mensajes import CentroMensajes
-from model.estafeta import EstafetaUniforme
+from model.estafeta import EstafetaConstante
 from model.grupo_rtd import GrupoRTD
 from model.puesto_comando import PuestoComando
 
@@ -17,16 +17,17 @@ if __name__ == '__main__':
 
     write_api = influxdb_logger()
 
-    environment = simpy.Environment()
-    pc = PuestoComando(environment)
-    rtef1 = GrupoRTD(environment, "Cdo Op")
-    rtef2 = GrupoRTD(environment, "Mat Pers")
-    rtef3 = GrupoRTD(environment, "Icia")
-    rtef4 = GrupoRTD(environment, "Cdo")
-    rtef5 = GrupoRTD(environment, "Op")
-    cm = CentroMensajes(environment, facilidades_ccic=[rtef1, rtef2, rtef3, rtef4, rtef5])
-    estafeta_pc = EstafetaUniforme(environment, recorrido=[pc, cm], maxtiempo=3)
-    estafeta_local = EstafetaUniforme(environment, recorrido=[rtef1, rtef2, rtef3, rtef4, rtef5, cm], maxtiempo=3)
+    environment = simpy.RealtimeEnvironment(strict=False)
+    pc = PuestoComando(environment, write_api)
+    rtef1 = GrupoRTD(environment, "Cdo Op", write_api)
+    rtef2 = GrupoRTD(environment, "Mat Pers", write_api)
+    rtef3 = GrupoRTD(environment, "Icia", write_api)
+    rtef4 = GrupoRTD(environment, "Cdo", write_api)
+    rtef5 = GrupoRTD(environment, "Op", write_api)
+    cm = CentroMensajes(environment, facilidades_ccic=[rtef1, rtef2, rtef3, rtef4, rtef5], db_connection=write_api)
+    estafeta_pc = EstafetaConstante(environment, recorrido=[pc, cm], tiempo=2, db_connection=write_api)
+    estafeta_local = EstafetaConstante(environment, recorrido=[rtef1, rtef2, rtef3, rtef4, rtef5, cm], tiempo=2,
+                                       db_connection=write_api)
     environment.process(pc.operar())
     environment.process(estafeta_pc.operar())
     environment.process(estafeta_local.operar())
@@ -36,7 +37,7 @@ if __name__ == '__main__':
     environment.process(rtef3.operar())
     environment.process(rtef4.operar())
     environment.process(rtef5.operar())
-    environment.run(until=60)
+    environment.run(until=600)
     for mensaje in pc.bandeja_entrada:
         print(mensaje)
     logging.info("Finalizó el programa")

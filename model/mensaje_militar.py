@@ -1,10 +1,13 @@
 import random
 from collections import namedtuple
+from datetime import datetime
+
+from influxdb_client import Point, WritePrecision
 
 Metadata = namedtuple('Metadata', ['nro_mensaje', 'clasif_seg', 'precedencia', 'es_cifrado'])
 
 
-class MensajeMilitar(dict):
+class MensajeMilitar:
     """Clase que modela un mensaje militar. Las manos por las que pasa el mensaje se guarada en el atributo trace"""
     nro_inicial = 0
 
@@ -25,6 +28,13 @@ class MensajeMilitar(dict):
                f'procedencia: {self.procedencia}'
 
     # TODO: que el mensaje guarde su trazabilidad en el atributo trace
+    def to_point(self, facilidad: str, evento: str) -> Point:
+        return Point("transaccion") \
+            .tag("facilidad", facilidad) \
+            .tag("destino", self.destino) \
+            .tag("procedencia", self.procedencia) \
+            .field(evento, self.metadata.nro_mensaje) \
+            .time(datetime.utcnow(), WritePrecision.NS)
 
 
 class GeneradorMensajes:

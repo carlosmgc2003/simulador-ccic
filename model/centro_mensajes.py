@@ -1,7 +1,9 @@
 import random
+from datetime import datetime
 from typing import List
 
 import simpy
+from influxdb_client import WriteApi, WritePrecision, Point
 from scipy.stats import beta
 
 from model import PUESTO_COMANDO
@@ -13,9 +15,10 @@ class CentroMensajes(Facilidad):
     """Clase que recibe coeficientes que modela los tiempos de servicio de procesamiento de mensajes.
     coeficientes : tuple = (p, q, a, b)"""
 
-    def __init__(self, environment: simpy.Environment, facilidades_ccic=None,
+    def __init__(self, environment: simpy.Environment, db_connection: WriteApi, facilidades_ccic=None,
                  coeficientes=(1.295, 1.902, 102.0, 720.0)):
-        super(CentroMensajes, self).__init__(name="Centro de Mensajes", environment=environment)
+        super(CentroMensajes, self).__init__(name="Centro de Mensajes", environment=environment,
+                                             db_connection=db_connection)
         if facilidades_ccic is None:
             facilidades_ccic = []
         self.tiempo_ocioso = 0
@@ -29,6 +32,7 @@ class CentroMensajes(Facilidad):
 
     def operar(self):
         while True:
+            self.registrar_long_cola()
             if self.bandeja_entrada:
                 yield self.environment.process(self.procesar_mensaje())
             else:
@@ -55,3 +59,9 @@ class CentroMensajes(Facilidad):
             mensaje.destino = random.choice(nombres_facilidades)
         else:
             mensaje.destino = PUESTO_COMANDO
+
+    def registrar_long_cola(self):
+        point = Point("long_cola") \
+            .field("mm_en_espera", len(self.bandeja_entrada)) \
+            .time(datetime.utcnow(), WritePrecision.NS)
+        self.writeApi.write("cola_cmd", "ccic", point)
