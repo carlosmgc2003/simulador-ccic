@@ -33,7 +33,7 @@ class MensajeMilitar:
             .tag("facilidad", facilidad) \
             .tag("destino", self.destino) \
             .tag("procedencia", self.procedencia) \
-            .field(evento, self.metadata.nro_mensaje) \
+            .field(evento, int(self.metadata.nro_mensaje)) \
             .time(datetime.utcnow(), WritePrecision.NS)
 
 
