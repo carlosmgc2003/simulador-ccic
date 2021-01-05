@@ -42,7 +42,7 @@ class CentroMensajes(Facilidad):
     def procesar_mensaje(self):
         """Generador de la acción del CM de procesar mensajes"""
         while True:
-            tservicio = 2  # Aca debe ir el tiempo de servicio real
+            tservicio = self.generar_t_espera()  # Aca debe ir el tiempo de servicio real
             mensaje_en_proceso: MensajeMilitar = self.bandeja_entrada.pop(0)
             print(f'PROCESO: {mensaje_en_proceso}')
             # Agregar el registro del procesamiento en el mensaje
@@ -64,4 +64,4 @@ class CentroMensajes(Facilidad):
         point = Point("long_cola") \
             .field("mm_en_espera", len(self.bandeja_entrada)) \
             .time(datetime.utcnow(), WritePrecision.NS)
-        self.writeApi.write("cola_cmd", "ccic", point)
+        self.writeApi.write("cola-cmd", "ccic", point)

@@ -25,8 +25,8 @@ if __name__ == '__main__':
     rtef4 = GrupoRTD(environment, "Cdo", write_api)
     rtef5 = GrupoRTD(environment, "Op", write_api)
     cm = CentroMensajes(environment, facilidades_ccic=[rtef1, rtef2, rtef3, rtef4, rtef5], db_connection=write_api)
-    estafeta_pc = EstafetaConstante(environment, recorrido=[pc, cm], tiempo=2, db_connection=write_api)
-    estafeta_local = EstafetaConstante(environment, recorrido=[rtef1, rtef2, rtef3, rtef4, rtef5, cm], tiempo=2,
+    estafeta_pc = EstafetaConstante(environment, recorrido=[pc, cm], tiempo=150, db_connection=write_api)
+    estafeta_local = EstafetaConstante(environment, recorrido=[rtef1, rtef2, rtef3, rtef4, rtef5, cm], tiempo=150,
                                        db_connection=write_api)
     environment.process(pc.operar())
     environment.process(estafeta_pc.operar())
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     environment.process(rtef3.operar())
     environment.process(rtef4.operar())
     environment.process(rtef5.operar())
-    environment.run(until=600)
+    environment.run(until=3600)
     for mensaje in pc.bandeja_entrada:
         print(mensaje)
     logging.info("Finalizó el programa")
