@@ -1,2 +1,0 @@
-INFLUX_DB_TOKEN = "OqxAckuO2Nx6ncJZYm_4tw_DmOdVTZ8oEF02nz7nznIoZ7217_whAbiupaXPsQUMoQZkJOhcFAp8QySnLUBw2Q=="
-INFLUX_DB_URL = "http://localhost:8086"
