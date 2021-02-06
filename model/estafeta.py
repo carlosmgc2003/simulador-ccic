@@ -44,14 +44,7 @@ class Estafeta(Actor):
                     facilidad.entregar_mm(self)
                     facilidad.recibir_mm(self)
                     yield self.environment.timeout(2)  # Tiempo que toma hablar con el escribiente
-                    print(f'{self.name}: Bolsa:')
-                    self.imprimir_bolsa()
                     yield self.environment.timeout(self.generar_t_recorrido())
-
-    def imprimir_bolsa(self):
-        for mensaje in self.bolsa_mensajes:
-            print(mensaje)
-        print('---------------------------')
 
 
 class EstafetaNormal(Estafeta):
@@ -102,3 +95,7 @@ class RedLan(Estafeta):
         super().__init__(environment=environment, tipo_estafeta='Red LAN', recorrido=recorrido,
                          db_connection=db_connection)
         self.tiempo = 0
+
+    def generar_t_recorrido(self):
+        """Genera su tiempo de recorrido"""
+        return self.tiempo

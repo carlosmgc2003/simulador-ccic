@@ -44,7 +44,6 @@ class CentroMensajes(Facilidad):
         while True:
             tservicio = self.generar_t_espera()  # Aca debe ir el tiempo de servicio real
             mensaje_en_proceso: MensajeMilitar = self.bandeja_entrada.pop(0)
-            print(f'PROCESO: {mensaje_en_proceso}')
             # Agregar el registro del procesamiento en el mensaje
             yield self.environment.timeout(tservicio)
             # Escribir el nuevo destino en el mensaje (Por ahora todos al PC)
