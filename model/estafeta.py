@@ -94,7 +94,7 @@ class RedLan(Estafeta):
     def __init__(self, environment: simpy.Environment, recorrido: list, db_connection: WriteApi):
         super().__init__(environment=environment, tipo_estafeta='Red LAN', recorrido=recorrido,
                          db_connection=db_connection)
-        self.tiempo = 0
+        self.tiempo = 1
 
     def generar_t_recorrido(self):
         """Genera su tiempo de recorrido"""
