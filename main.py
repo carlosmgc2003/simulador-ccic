@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     write_api = influxdb_logger()
 
-    environment = simpy.RealtimeEnvironment(strict=False)
+    environment = simpy.Environment()
     pc = PuestoComando(environment, write_api)
     rtef1 = GrupoRTD(environment, "Cdo Op", write_api)
     rtef2 = GrupoRTD(environment, "Mat Pers", write_api)
@@ -25,8 +25,8 @@ if __name__ == '__main__':
     rtef4 = GrupoRTD(environment, "Cdo", write_api)
     rtef5 = GrupoRTD(environment, "Op", write_api)
     cm = CentroMensajes(environment, facilidades_ccic=[rtef1, rtef2, rtef3, rtef4, rtef5], db_connection=write_api)
-    estafeta_pc = EstafetaConstante(environment, recorrido=[pc, cm], tiempo=150, db_connection=write_api)
-    estafeta_local = EstafetaConstante(environment, recorrido=[rtef1, rtef2, rtef3, rtef4, rtef5, cm], tiempo=150,
+    estafeta_pc = EstafetaConstante(environment, recorrido=[pc, cm], tiempo=30, db_connection=write_api)
+    estafeta_local = EstafetaConstante(environment, recorrido=[rtef1, rtef2, rtef3, rtef4, rtef5, cm], tiempo=30,
                                        db_connection=write_api)
     environment.process(pc.operar())
     environment.process(estafeta_pc.operar())
@@ -40,4 +40,5 @@ if __name__ == '__main__':
     environment.run(until=3600)
     for mensaje in pc.bandeja_entrada:
         print(mensaje)
+    write_api.close()
     logging.info("Finalizó el programa")

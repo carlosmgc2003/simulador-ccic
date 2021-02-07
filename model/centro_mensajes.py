@@ -28,16 +28,18 @@ class CentroMensajes(Facilidad):
 
 
     def generar_t_espera(self):
-        return int(self.fdp.rvs() * (self.coeficientes[3] - self.coeficientes[2]) + self.coeficientes[2])
+        # return int(self.fdp.rvs() * (self.coeficientes[3] - self.coeficientes[2]) + self.coeficientes[2])
+        return 100
 
     def operar(self):
         while True:
+            print(f"{self.name} Bandeja Salida:{len(self.bandeja_salida)} Bandeja Entrada: {len(self.bandeja_entrada)}")
             self.registrar_long_cola()
-            if self.bandeja_entrada:
+            if len(self.bandeja_entrada) > 0:
                 yield self.environment.process(self.procesar_mensaje())
             else:
-                self.tiempo_ocioso += 1
-                yield self.environment.timeout(1)
+                self.tiempo_ocioso += 5
+                yield self.environment.timeout(5)
 
     def procesar_mensaje(self):
         """Generador de la acción del CM de procesar mensajes"""

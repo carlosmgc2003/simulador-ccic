@@ -16,7 +16,7 @@ class GrupoRTD(Facilidad):
         self.operador = GeneradorMensajes()
 
     def generar_t_espera(self):
-        return abs(norm.rvs() * 300)
+        return abs(norm.rvs() * 150)
 
     def generar_mm(self):
         """ El GrupoRTD ingresa un mensaje al CCIC """
@@ -30,19 +30,20 @@ class GrupoRTD(Facilidad):
 
     def transmitir_mm(self):
         """ Remover un mensaje de la bandeja de entrada y transmitirlo"""
-        if self.bandeja_entrada:
-            mensaje = self.bandeja_entrada.pop(0)
-            print(f'{self.name}: TRANSMITIDO {mensaje}')
-            # Lugar para poner el tiempo aleatorio de transmision de mensajes
-            yield self.environment.timeout(self.generar_t_espera())
-            self.registrar_mm("transmitido", int(mensaje.metadata.nro_mensaje))
-        else:
-            yield self.environment.timeout(0)
+        mensaje = self.bandeja_entrada.pop(0)
+        print(f'{self.name}: TRANSMITIDO {mensaje}')
+        # Lugar para poner el tiempo aleatorio de transmision de mensajes
+        yield self.environment.timeout(self.generar_t_espera())
+        self.registrar_mm("transmitido", int(mensaje.metadata.nro_mensaje))
 
     def operar(self):
         while True:
-            yield self.environment.process(self.generar_mm())
-            yield self.environment.process(self.transmitir_mm())
+            print(f"{self.name} Bandeja Salida:{len(self.bandeja_salida)} Bandeja Entrada: {len(self.bandeja_entrada)}")
+            if len(self.bandeja_salida) == 0:
+                yield self.environment.process(self.generar_mm())
+            if len(self.bandeja_entrada) > 0:
+                yield self.environment.process(self.transmitir_mm())
+            yield self.environment.timeout(5)
 
     def registrar_mm(self, actividad, nro_mm):
         point = Point("mm") \
