@@ -6,7 +6,7 @@ import simpy
 from influxdb_client import WriteApi, WritePrecision, Point
 from scipy.stats import beta
 
-from model import PUESTO_COMANDO
+from model import PUESTO_COMANDO, TIEMPO_OCIOSO
 from model.facility import Facilidad
 from model.mensaje_militar import MensajeMilitar
 
@@ -39,7 +39,7 @@ class CentroMensajes(Facilidad):
                 yield self.environment.process(self.procesar_mensaje())
             else:
                 self.tiempo_ocioso += 5
-                yield self.environment.timeout(5)
+                yield self.environment.timeout(TIEMPO_OCIOSO)
 
     def procesar_mensaje(self):
         """Generador de la acción del CM de procesar mensajes"""

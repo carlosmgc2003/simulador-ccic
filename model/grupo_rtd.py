@@ -3,7 +3,7 @@ from datetime import datetime
 from influxdb_client import WriteApi, WritePrecision, Point
 from scipy.stats import norm
 
-from model import DESTINO_PROC_MM
+from model import DESTINO_PROC_MM, TIEMPO_OCIOSO
 from model.facility import Facilidad
 from model.mensaje_militar import GeneradorMensajes
 
@@ -43,7 +43,7 @@ class GrupoRTD(Facilidad):
                 yield self.environment.process(self.generar_mm())
             if len(self.bandeja_entrada) > 0:
                 yield self.environment.process(self.transmitir_mm())
-            yield self.environment.timeout(5)
+            yield self.environment.timeout(TIEMPO_OCIOSO)
 
     def registrar_mm(self, actividad, nro_mm):
         point = Point("mm") \
