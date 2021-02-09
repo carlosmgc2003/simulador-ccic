@@ -1,9 +1,10 @@
 from datetime import datetime
+from random import random
 
 from influxdb_client import WriteApi, WritePrecision, Point
 from scipy.stats import norm
 
-from model import DESTINO_PROC_MM, TIEMPO_OCIOSO
+from model import DESTINO_PROC_MM, TIEMPO_OCIOSO, DEMANDA, TIEMPO_RECUPERACION
 from model.facility import Facilidad
 from model.mensaje_militar import GeneradorMensajes
 
@@ -16,7 +17,7 @@ class GrupoRTD(Facilidad):
         self.operador = GeneradorMensajes()
 
     def generar_t_espera(self):
-        return abs(norm.rvs() * 150)
+        return abs(norm.rvs() * TIEMPO_RECUPERACION)
 
     def generar_mm(self):
         """ El GrupoRTD ingresa un mensaje al CCIC """
@@ -38,8 +39,9 @@ class GrupoRTD(Facilidad):
 
     def operar(self):
         while True:
-            print(f"{self.name} Bandeja Salida:{len(self.bandeja_salida)} Bandeja Entrada: {len(self.bandeja_entrada)}")
-            if len(self.bandeja_salida) == 0:
+            print(f'Turno de: {self.name}')
+            probabilidad_trafico = random()
+            if probabilidad_trafico < DEMANDA:
                 yield self.environment.process(self.generar_mm())
             if len(self.bandeja_entrada) > 0:
                 yield self.environment.process(self.transmitir_mm())
