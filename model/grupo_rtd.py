@@ -6,14 +6,16 @@ from scipy.stats import norm
 
 from model import DESTINO_PROC_MM, TIEMPO_OCIOSO, DEMANDA, TIEMPO_RECUPERACION
 from model.facility import Facilidad
+from model.generador import Generador
 from model.mensaje_militar import GeneradorMensajes
 
 
 class GrupoRTD(Facilidad):
     """Cabina de radio transmision de datos que recibe los mensajes salientes del CCIC y los transmite y genera los mensajes entrantes."""
 
-    def __init__(self, environment, red: str, db_connection: WriteApi):
-        super(GrupoRTD, self).__init__(name="Red " + red, environment=environment, db_connection=db_connection)
+    def __init__(self, environment, red: str, db_connection: WriteApi, enchufado_a: Generador):
+        super(GrupoRTD, self).__init__(name="Red " + red, environment=environment, db_connection=db_connection,
+                                       enchufado_a=enchufado_a)
         self.operador = GeneradorMensajes()
 
     def generar_t_espera(self):

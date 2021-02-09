@@ -8,6 +8,7 @@ from scipy.stats import beta
 
 from model import PUESTO_COMANDO, TIEMPO_OCIOSO
 from model.facility import Facilidad
+from model.generador import Generador
 from model.mensaje_militar import MensajeMilitar
 
 
@@ -15,10 +16,11 @@ class CentroMensajes(Facilidad):
     """Clase que recibe coeficientes que modela los tiempos de servicio de procesamiento de mensajes.
     coeficientes : tuple = (p, q, a, b)"""
 
-    def __init__(self, environment: simpy.Environment, db_connection: WriteApi, facilidades_ccic=None,
+    def __init__(self, environment: simpy.Environment, db_connection: WriteApi, enchufado_a: Generador,
+                 facilidades_ccic=None,
                  coeficientes=(1.295, 1.902, 102.0, 720.0)):
         super(CentroMensajes, self).__init__(name="Centro de Mensajes", environment=environment,
-                                             db_connection=db_connection)
+                                             db_connection=db_connection, enchufado_a=enchufado_a)
         if facilidades_ccic is None:
             facilidades_ccic = []
         self.tiempo_ocioso = 0
@@ -28,8 +30,7 @@ class CentroMensajes(Facilidad):
 
 
     def generar_t_espera(self):
-        # return int(self.fdp.rvs() * (self.coeficientes[3] - self.coeficientes[2]) + self.coeficientes[2])
-        return 100
+        return int(self.fdp.rvs() * (self.coeficientes[3] - self.coeficientes[2]) + self.coeficientes[2])
 
     def operar(self):
         while True:
