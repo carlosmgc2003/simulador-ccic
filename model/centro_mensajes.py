@@ -42,16 +42,15 @@ class CentroMensajes(Facilidad):
 
     def procesar_mensaje(self):
         """Generador de la acción del CM de procesar mensajes"""
-        while True:
-            tservicio = self.generar_t_espera()  # Aca debe ir el tiempo de servicio real
-            mensaje_en_proceso: MensajeMilitar = self.bandeja_entrada.pop(0)
-            # Agregar el registro del procesamiento en el mensaje
-            yield self.environment.timeout(tservicio)
-            # Escribir el nuevo destino en el mensaje (Por ahora todos al PC)
-            self.encaminar_mensaje(mensaje_en_proceso)
-            mensaje_en_proceso.procedencia = self.name
-            self.bandeja_salida.append(mensaje_en_proceso)
-            yield self.environment.process(self.operar())
+        tservicio = self.generar_t_espera()  # Aca debe ir el tiempo de servicio real
+        mensaje_en_proceso: MensajeMilitar = self.bandeja_entrada.pop(0)
+        # Agregar el registro del procesamiento en el mensaje
+        yield self.environment.timeout(tservicio)
+        # Escribir el nuevo destino en el mensaje (Por ahora todos al PC)
+        self.encaminar_mensaje(mensaje_en_proceso)
+        mensaje_en_proceso.procedencia = self.name
+        self.bandeja_salida.append(mensaje_en_proceso)
+        yield self.environment.process(self.operar())
 
     def encaminar_mensaje(self, mensaje: MensajeMilitar):
         nombres_facilidades = list(map(lambda x: x.name, self.facilidades_ccic))
