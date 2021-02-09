@@ -33,13 +33,12 @@ class CentroMensajes(Facilidad):
 
     def operar(self):
         while True:
-            print(f"{self.name} Bandeja Salida:{len(self.bandeja_salida)} Bandeja Entrada: {len(self.bandeja_entrada)}")
+            print(f'Turno de: {self.name}')
             self.registrar_long_cola()
             if len(self.bandeja_entrada) > 0:
                 yield self.environment.process(self.procesar_mensaje())
-            else:
-                self.tiempo_ocioso += 5
-                yield self.environment.timeout(TIEMPO_OCIOSO)
+            self.tiempo_ocioso += 5
+            yield self.environment.timeout(TIEMPO_OCIOSO)
 
     def procesar_mensaje(self):
         """Generador de la acción del CM de procesar mensajes"""
