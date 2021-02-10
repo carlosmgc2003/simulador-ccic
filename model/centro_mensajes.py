@@ -1,9 +1,8 @@
 import random
-from datetime import datetime
 from typing import List
 
 import simpy
-from influxdb_client import WriteApi, WritePrecision, Point
+from influxdb_client import WriteApi
 from scipy.stats import beta
 
 from model import PUESTO_COMANDO, TIEMPO_OCIOSO
@@ -36,14 +35,24 @@ class CentroMensajes(Facilidad):
         while True:
             print(f'Turno de: {self.name}')
             self.registrar_long_cola()
-            if len(self.bandeja_entrada) > 0:
-                yield self.environment.process(self.procesar_mensaje())
+            if self.generador.genera_electricidad():
+                if not self.tiene_alimentacion:
+                    self.poner_en_servicio()
+                # Actividades del Gpo Rtef
+                if len(self.bandeja_entrada) > 0:
+                    yield self.environment.process(self.procesar_mensaje())
+            else:
+                if self.tiene_alimentacion:
+                    self.poner_fuera_servicio()
+                if len(self.bandeja_entrada) > 0:
+                    yield self.environment.process(self.procesar_mensaje(penalizacion=1.5))
+            self.tiene_alimentacion = self.generador.genera_electricidad()
             self.tiempo_ocioso += 5
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
-    def procesar_mensaje(self):
+    def procesar_mensaje(self, penalizacion: float = 1.0):
         """Generador de la acción del CM de procesar mensajes"""
-        tservicio = self.generar_t_espera()  # Aca debe ir el tiempo de servicio real
+        tservicio = self.generar_t_espera() * penalizacion  # Aca debe ir el tiempo de servicio real
         mensaje_en_proceso: MensajeMilitar = self.bandeja_entrada.pop(0)
         # Agregar el registro del procesamiento en el mensaje
         yield self.environment.timeout(tservicio)
@@ -59,9 +68,3 @@ class CentroMensajes(Facilidad):
             mensaje.destino = random.choice(nombres_facilidades)
         else:
             mensaje.destino = PUESTO_COMANDO
-
-    def registrar_long_cola(self):
-        point = Point("long_cola") \
-            .field("mm_en_espera", len(self.bandeja_entrada)) \
-            .time(datetime.utcnow(), WritePrecision.NS)
-        self.writeApi.write("cola-cmd", "ccic", point)
