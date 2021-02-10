@@ -16,13 +16,16 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S
 # Grupo electrogeno Kawasaki
 CAPACIDAD = 12.0  # Litros
 CONSUMO_COMBUS = (
-                             1.0 / 3600) * TIEMPO_OCIOSO  # 1 litro sobre 3600 segundos (hora) por TIEMPO_OCIOSO (menor unidad de resolucion de tiempo)
+                         1.0 / 3600) * TIEMPO_OCIOSO  # 1 litro sobre 3600 segundos (hora) por TIEMPO_OCIOSO (menor unidad de resolucion de tiempo)
 NIVEL_COMBUSTIBLE = 6.0
 
 if __name__ == '__main__':
     logging.info("Inició el programa")
-
-    write_api = influxdb_logger()
+    try:
+        write_api = influxdb_logger()
+    except Exception as e:
+        print(e)
+        exit(1)
     t_recorrido_estaf = 30
 
     environment = simpy.Environment()
@@ -30,7 +33,7 @@ if __name__ == '__main__':
     generador1 = Generador(environment=environment, name="Generador CMD", capacidad_combus=CAPACIDAD,
                            consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE, db_connection=write_api)
     generador2 = Generador(environment=environment, name="Generador Redes Ext", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE, db_connection=write_api)
+                           consumo_combus=CONSUMO_COMBUS, nivel_combus=2, db_connection=write_api)
     generador3 = Generador(environment=environment, name="Generador Redes Int", capacidad_combus=CAPACIDAD,
                            consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE, db_connection=write_api)
     generador4 = Generador(environment=environment, name="Generador PC", capacidad_combus=CAPACIDAD,
@@ -65,7 +68,5 @@ if __name__ == '__main__':
     environment.process(generador3.operar())
     environment.process(generador4.operar())
     environment.run(until=30000)
-    for mensaje in pc.bandeja_entrada:
-        print(mensaje)
     write_api.close()
     logging.info("Finalizó el programa")
