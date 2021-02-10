@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from model import mensaje_militar
 
 
@@ -7,7 +8,6 @@ class TestMensajeMilitar(TestCase):
         generator = mensaje_militar.GeneradorMensajes()
         mm = generator.generar_mensaje()
         self.assertTrue(mm.destino == "")
-        self.assertTrue(mm.name == "Mensaje Militar")
 
 
 class TestGeneradorMensajes(TestCase):
