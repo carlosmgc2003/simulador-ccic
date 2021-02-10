@@ -1,7 +1,7 @@
-from datetime import datetime
+
 from random import random
 
-from influxdb_client import WriteApi, WritePrecision, Point
+from influxdb_client import WriteApi
 from scipy.stats import norm
 
 from model import DESTINO_PROC_MM, TIEMPO_OCIOSO, DEMANDA, TIEMPO_RECUPERACION
@@ -29,7 +29,7 @@ class GrupoRTD(Facilidad):
         self.bandeja_salida.append(nuevo_mm_saliente)
         # Lugar para poner el tiempo aleatorio de generacion de mensajes
         yield self.environment.timeout(self.generar_t_espera())
-        self.registrar_mm("recibido", int(nuevo_mm_saliente.metadata.nro_mensaje))
+        # Registrar el dato para la BDSQL
 
     def transmitir_mm(self):
         """ Remover un mensaje de la bandeja de entrada y transmitirlo"""
@@ -37,21 +37,27 @@ class GrupoRTD(Facilidad):
         print(f'{self.name}: TRANSMITIDO {mensaje}')
         # Lugar para poner el tiempo aleatorio de transmision de mensajes
         yield self.environment.timeout(self.generar_t_espera())
-        self.registrar_mm("transmitido", int(mensaje.metadata.nro_mensaje))
+        # Registrar el dato para la BDSQL
 
     def operar(self):
         while True:
             print(f'Turno de: {self.name}')
             probabilidad_trafico = random()
-            if probabilidad_trafico < DEMANDA:
-                yield self.environment.process(self.generar_mm())
-            if len(self.bandeja_entrada) > 0:
-                yield self.environment.process(self.transmitir_mm())
+            self.registrar_long_cola()
+            if self.generador.genera_electricidad():
+                if not self.tiene_alimentacion:
+                    self.poner_en_servicio()
+                # Actividades del Gpo Rtef
+                if probabilidad_trafico < DEMANDA:
+                    yield self.environment.process(self.generar_mm())
+                if len(self.bandeja_entrada) > 0:
+                    yield self.environment.process(self.transmitir_mm())
+            else:
+                if self.tiene_alimentacion:
+                    self.poner_fuera_servicio()
+            self.tiene_alimentacion = self.generador.genera_electricidad()
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
-    def registrar_mm(self, actividad, nro_mm):
-        point = Point("mm") \
-            .tag("facilidad", self.name) \
-            .field(actividad, nro_mm) \
-            .time(datetime.utcnow(), WritePrecision.NS)
-        self.writeApi.write("gpos-rtef", "ccic", point)
+    def registrar_mm(self):
+        # Debe hacerse el insert en la BD SQL
+        pass

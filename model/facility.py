@@ -1,12 +1,14 @@
+from datetime import datetime
 from typing import List
 
 import simpy
-from influxdb_client import WriteApi
+from influxdb_client import WriteApi, Point, WritePrecision
 
 from .actor import Actor
 from .generador import Generador
 from .mensaje_militar import MensajeMilitar
 
+ESTADOS = ["en servicio", "servicio limitado", "fuera servicio"]
 
 class Facilidad(Actor):
     """Facilidad es una clase abstracta que reune las abstracciones en comun de las facilidades del CCIC, relacionadas
@@ -18,12 +20,14 @@ class Facilidad(Actor):
         self.bandeja_salida: List[MensajeMilitar] = []
         self.escribiente: simpy.Resource = simpy.Resource(environment, 1)
         self.generador = enchufado_a
+        self.estado = ESTADOS[2]
+        self.tiene_alimentacion = False
 
     def recibir_mm(self, estafeta):
         bolsa_mensajes: List[MensajeMilitar] = estafeta.bolsa_mensajes.copy()
         for mensaje in bolsa_mensajes:
             if mensaje.destino == self.name:
-                self.writeApi.write(bucket="mensajes-ccic", org="ccic", record=mensaje.to_point(self.name, "recibir"))
+                # self.writeApi.write(bucket="mensajes-ccic", org="ccic", record=mensaje.to_point(self.name, "recibir"))
                 self.bandeja_entrada.append(estafeta.entregar_mensaje(mensaje))
                 print(f'{self.name} RECIBIDO: {mensaje}')
 
@@ -31,6 +35,28 @@ class Facilidad(Actor):
         bandeja_salida = self.bandeja_salida.copy()
         for mensaje in bandeja_salida:
             if mensaje.destino in list(map(lambda x: x.name, estafeta.recorrido)):
-                self.writeApi.write(bucket="mensajes-ccic", org="ccic", record=mensaje.to_point(self.name, "entregar"))
+                # self.writeApi.write(bucket="mensajes-ccic", org="ccic", record=mensaje.to_point(self.name, "entregar"))
                 self.bandeja_salida.remove(estafeta.recoger_mensaje(mensaje))
                 print(f'{self.name} ENTREGADO: {mensaje}')
+
+    def poner_en_servicio(self):
+        self.estado = ESTADOS[0]
+        self.reportar_estado_servicio()
+
+    def poner_fuera_servicio(self):
+        self.estado = ESTADOS[2]
+        self.reportar_estado_servicio()
+
+    def reportar_estado_servicio(self):
+        estado = Point("estado") \
+            .tag("facilidad", self.name) \
+            .field("valor", self.estado) \
+            .time(datetime.utcnow(), WritePrecision.NS)
+        self.writeApi.write(bucket="estado-servicio", org="ccic", record=estado)
+
+    def registrar_long_cola(self):
+        point = Point("long_cola") \
+            .field("mm_en_espera", len(self.bandeja_entrada)) \
+            .tag("facilidad", self.name) \
+            .time(datetime.utcnow(), WritePrecision.NS)
+        self.writeApi.write("colas-espera", "ccic", point)

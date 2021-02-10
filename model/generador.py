@@ -42,7 +42,7 @@ class Generador(Actor):
             self.writeApi.write(bucket="tension-generador", org="ccic", record=tension)
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
-    def estado(self):
+    def genera_electricidad(self):
         return self.encendido
 
     def medir_nivel(self) -> Point:
