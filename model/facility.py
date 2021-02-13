@@ -1,9 +1,9 @@
-from datetime import datetime
 from typing import List
 
 import simpy
-from influxdb_client import WriteApi, Point, WritePrecision
+from influxdb_client import WriteApi
 
+from logger.requests import metrics_api, events_api
 from .actor import Actor
 from .generador import Generador
 from .mensaje_militar import MensajeMilitar
@@ -28,6 +28,7 @@ class Facilidad(Actor):
         for mensaje in bolsa_mensajes:
             if mensaje.destino == self.name:
                 # self.writeApi.write(bucket="mensajes-ccic", org="ccic", record=mensaje.to_point(self.name, "recibir"))
+                self.reportar_evento_mm(mensaje=mensaje, evento="recibir")
                 self.bandeja_entrada.append(estafeta.entregar_mensaje(mensaje))
                 print(f'{self.name} RECIBIDO: {mensaje}')
 
@@ -36,6 +37,7 @@ class Facilidad(Actor):
         for mensaje in bandeja_salida:
             if mensaje.destino in list(map(lambda x: x.name, estafeta.recorrido)):
                 # self.writeApi.write(bucket="mensajes-ccic", org="ccic", record=mensaje.to_point(self.name, "entregar"))
+                self.reportar_evento_mm(mensaje=mensaje, evento="entregar")
                 self.bandeja_salida.remove(estafeta.recoger_mensaje(mensaje))
                 print(f'{self.name} ENTREGADO: {mensaje}')
 
@@ -48,15 +50,22 @@ class Facilidad(Actor):
         self.reportar_estado_servicio()
 
     def reportar_estado_servicio(self):
-        estado = Point("estado") \
-            .tag("facilidad", self.name) \
-            .field("valor", self.estado) \
-            .time(datetime.utcnow(), WritePrecision.NS)
-        self.writeApi.write(bucket="estado-servicio", org="ccic", record=estado)
+        data = {"facilidad": self.name, "estado": self.estado}
+        metrics_api("estado-servicio", data)
+        # estado = Point("estado") \
+        #     .tag("facilidad", self.name) \
+        #     .field("valor", self.estado) \
+        #     .time(datetime.utcnow(), WritePrecision.NS)
+        # self.writeApi.write(bucket="estado-servicio", org="ccic", record=estado)
 
-    def registrar_long_cola(self):
-        point = Point("long_cola") \
-            .field("mm_en_espera", len(self.bandeja_entrada)) \
-            .tag("facilidad", self.name) \
-            .time(datetime.utcnow(), WritePrecision.NS)
-        self.writeApi.write("colas-espera", "ccic", point)
+    def reportar_long_cola(self):
+        data = {"facilidad": self.name, "long_cola": len(self.bandeja_entrada)}
+        metrics_api("longitud-cola", data)
+        # point = Point("long_cola") \
+        #     .field("mm_en_espera", len(self.bandeja_entrada)) \
+        #     .tag("facilidad", self.name) \
+        #     .time(datetime.utcnow(), WritePrecision.NS)
+        # self.writeApi.write("colas-espera", "ccic", point)
+
+    def reportar_evento_mm(self, mensaje: MensajeMilitar, evento: str):
+        events_api("mens-mil", mensaje.to_dict(evento))

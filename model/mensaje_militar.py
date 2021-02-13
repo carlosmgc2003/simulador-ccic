@@ -1,7 +1,6 @@
 import random
 from collections import namedtuple
 
-
 Metadata = namedtuple('Metadata', ['nro_mensaje', 'clasif_seg', 'precedencia', 'es_cifrado'])
 
 
@@ -33,6 +32,17 @@ class MensajeMilitar:
     #         .tag("procedencia", self.procedencia) \
     #         .field(evento, int(self.metadata.nro_mensaje)) \
     #         .time(datetime.utcnow(), WritePrecision.NS)
+
+    def to_dict(self, evento: str) -> dict:
+        return {
+            "nro_mm": self.metadata.nro_mensaje,
+            "clasificacion": self.metadata.clasif_seg,
+            "precedencia": self.metadata.precedencia,
+            "cifrado": self.metadata.es_cifrado,
+            "destino": self.destino,
+            "origen": self.procedencia,
+            "Evento": evento
+        }
 
 
 class GeneradorMensajes:

@@ -1,8 +1,6 @@
 import random
-from datetime import datetime
 
-from influxdb_client import Point, WritePrecision
-
+from logger.requests import metrics_api
 from model import TIEMPO_OCIOSO, DESV_STD_CONS_COMBUS, DESV_STD_TENSION, TENSION
 from model.actor import Actor
 
@@ -36,23 +34,29 @@ class Generador(Actor):
         while True:
             print(f'Turno de: {self.name}')
             self.consumir_combustible()
-            nivel = self.medir_nivel()
-            tension = self.medir_tension()
-            self.writeApi.write(bucket="combustible-generador", org="ccic", record=nivel)
-            self.writeApi.write(bucket="tension-generador", org="ccic", record=tension)
+            self.reportar_nivel()
+            self.reportar_tension()
+            # nivel = self.medir_nivel()
+            # tension = self.medir_tension()
+            # self.writeApi.write(bucket="combustible-generador", org="ccic", record=nivel)
+            # self.writeApi.write(bucket="tension-generador", org="ccic", record=tension)
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
     def genera_electricidad(self):
         return self.encendido
 
-    def medir_nivel(self) -> Point:
-        return Point("litros") \
-            .tag("identificacion", self.name) \
-            .field("nivel", self.nivel_combus) \
-            .time(datetime.utcnow(), WritePrecision.NS)
+    def reportar_nivel(self):
+        data = {'generador': self.name, 'nivel': self.nivel_combus}
+        metrics_api("nivel-combus", data)
+        # return Point("litros") \
+        #     .tag("identificacion", self.name) \
+        #     .field("nivel", self.nivel_combus) \
+        #     .time(datetime.utcnow(), WritePrecision.NS)
 
-    def medir_tension(self) -> Point:
-        return Point("volts") \
-            .tag("identificacion", self.name) \
-            .field("tension", self.tension) \
-            .time(datetime.utcnow(), WritePrecision.NS)
+    def reportar_tension(self):
+        data = {'generador': self.name, 'tension': self.tension}
+        metrics_api("nivel-tension", data)
+        # return Point("volts") \
+        #     .tag("identificacion", self.name) \
+        #     .field("tension", self.tension) \
+        #     .time(datetime.utcnow(), WritePrecision.NS)

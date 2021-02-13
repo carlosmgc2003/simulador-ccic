@@ -29,7 +29,6 @@ if __name__ == '__main__':
     t_recorrido_estaf = 30
 
     environment = simpy.Environment()
-
     generador1 = Generador(environment=environment, name="Generador CMD", capacidad_combus=CAPACIDAD,
                            consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE, db_connection=write_api)
     generador2 = Generador(environment=environment, name="Generador Redes Ext", capacidad_combus=CAPACIDAD,
@@ -67,6 +66,6 @@ if __name__ == '__main__':
     environment.process(generador2.operar())
     environment.process(generador3.operar())
     environment.process(generador4.operar())
-    environment.run(until=30000)
+    environment.run(until=3600)
     write_api.close()
     logging.info("Finalizó el programa")
