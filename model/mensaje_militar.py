@@ -24,15 +24,6 @@ class MensajeMilitar:
                f'destino: {self.destino}, ' \
                f'procedencia: {self.procedencia}'
 
-    # TODO: Esta funcion debe guardar el mensaje como TUPLA en la RDBS
-    # def to_point(self, facilidad: str, evento: str) -> Point:
-    #     return Point("transaccion") \
-    #         .tag("facilidad", facilidad) \
-    #         .tag("destino", self.destino) \
-    #         .tag("procedencia", self.procedencia) \
-    #         .field(evento, int(self.metadata.nro_mensaje)) \
-    #         .time(datetime.utcnow(), WritePrecision.NS)
-
     def to_dict(self, evento: str) -> dict:
         return {
             "nro_mm": self.metadata.nro_mensaje,

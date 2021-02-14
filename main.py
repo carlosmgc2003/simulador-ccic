@@ -2,7 +2,7 @@ import logging
 
 import simpy
 
-from logger.logger import influxdb_logger
+from logger.requests import events_clear
 from model import TIEMPO_OCIOSO
 from model.centro_mensajes import CentroMensajes
 from model.estafeta import EstafetaConstante
@@ -21,37 +21,31 @@ NIVEL_COMBUSTIBLE = 6.0
 
 if __name__ == '__main__':
     logging.info("Inició el programa")
-    try:
-        write_api = influxdb_logger()
-    except Exception as e:
-        print(e)
-        exit(1)
+
     t_recorrido_estaf = 30
 
-    environment = simpy.Environment()
+    environment = simpy.RealtimeEnvironment(factor=2.0)
     generador1 = Generador(environment=environment, name="Generador CMD", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE, db_connection=write_api)
+                           consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE)
     generador2 = Generador(environment=environment, name="Generador Redes Ext", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=2, db_connection=write_api)
+                           consumo_combus=CONSUMO_COMBUS, nivel_combus=2)
     generador3 = Generador(environment=environment, name="Generador Redes Int", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE, db_connection=write_api)
+                           consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE)
     generador4 = Generador(environment=environment, name="Generador PC", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE, db_connection=write_api)
+                           consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE)
 
-    pc = PuestoComando(environment=environment, db_connection=write_api, enchufado_a=generador4)
+    pc = PuestoComando(environment=environment, enchufado_a=generador4)
 
-    rtef1 = GrupoRTD(environment, "Cdo Op", db_connection=write_api, enchufado_a=generador3)
-    rtef2 = GrupoRTD(environment, "Mat Pers", db_connection=write_api, enchufado_a=generador3)
-    rtef3 = GrupoRTD(environment, "Icia", db_connection=write_api, enchufado_a=generador3)
-    rtef4 = GrupoRTD(environment, "Cdo", db_connection=write_api, enchufado_a=generador2)
-    rtef5 = GrupoRTD(environment, "Op", db_connection=write_api, enchufado_a=generador2)
-    cm = CentroMensajes(environment, facilidades_ccic=[rtef1, rtef2, rtef3, rtef4, rtef5], db_connection=write_api,
-                        enchufado_a=generador1)
+    rtef1 = GrupoRTD(environment, "Cdo Op", enchufado_a=generador3)
+    rtef2 = GrupoRTD(environment, "Mat Pers", enchufado_a=generador3)
+    rtef3 = GrupoRTD(environment, "Icia", enchufado_a=generador3)
+    rtef4 = GrupoRTD(environment, "Cdo", enchufado_a=generador2)
+    rtef5 = GrupoRTD(environment, "Op", enchufado_a=generador2)
+    cm = CentroMensajes(environment, facilidades_ccic=[rtef1, rtef2, rtef3, rtef4, rtef5], enchufado_a=generador1)
 
-    estafeta_pc = EstafetaConstante(environment, recorrido=[pc, cm], tiempo=t_recorrido_estaf, db_connection=write_api)
+    estafeta_pc = EstafetaConstante(environment, recorrido=[pc, cm], tiempo=t_recorrido_estaf)
     estafeta_local = EstafetaConstante(environment, recorrido=[rtef1, rtef2, rtef3, rtef4, rtef5, cm],
-                                       tiempo=t_recorrido_estaf,
-                                       db_connection=write_api)
+                                       tiempo=t_recorrido_estaf // 5)
 
     environment.process(pc.operar())
     environment.process(estafeta_pc.operar())
@@ -66,6 +60,6 @@ if __name__ == '__main__':
     environment.process(generador2.operar())
     environment.process(generador3.operar())
     environment.process(generador4.operar())
-    environment.run(until=3600)
-    write_api.close()
+    environment.run(until=3600 * 2)
+    events_clear("mens-mil")
     logging.info("Finalizó el programa")

@@ -1,13 +1,11 @@
 import simpy
-from influxdb_client import WriteApi
 
 
 class Actor:
     """Clase abstracta que representa a todos los objetos de modelo que participan de la simulación"""
 
-    def __init__(self, name: str, environment: simpy.Environment, db_connection: WriteApi):
+    def __init__(self, name: str, environment: simpy.Environment):
         self.environment = environment
-        self.writeApi = db_connection
         if len(name) > 0:
             self.name = name
         else:

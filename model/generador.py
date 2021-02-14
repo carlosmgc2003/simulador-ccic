@@ -1,6 +1,6 @@
 import random
 
-from logger.requests import metrics_api
+from logger.requests import metrics_insert
 from model import TIEMPO_OCIOSO, DESV_STD_CONS_COMBUS, DESV_STD_TENSION, TENSION
 from model.actor import Actor
 
@@ -11,8 +11,8 @@ class Generador(Actor):
     La tension TENSION varia de forma estándar con la DESV_STD_TENSION
     """
 
-    def __init__(self, name, environment, capacidad_combus, consumo_combus, nivel_combus, db_connection):
-        super(Generador, self).__init__(name=name, environment=environment, db_connection=db_connection)
+    def __init__(self, name, environment, capacidad_combus, consumo_combus, nivel_combus):
+        super(Generador, self).__init__(name=name, environment=environment)
         self.capacidad_combus = capacidad_combus
         self.consumo_combus = consumo_combus
         self.nivel_combus = nivel_combus
@@ -36,10 +36,6 @@ class Generador(Actor):
             self.consumir_combustible()
             self.reportar_nivel()
             self.reportar_tension()
-            # nivel = self.medir_nivel()
-            # tension = self.medir_tension()
-            # self.writeApi.write(bucket="combustible-generador", org="ccic", record=nivel)
-            # self.writeApi.write(bucket="tension-generador", org="ccic", record=tension)
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
     def genera_electricidad(self):
@@ -47,16 +43,8 @@ class Generador(Actor):
 
     def reportar_nivel(self):
         data = {'generador': self.name, 'nivel': self.nivel_combus}
-        metrics_api("nivel-combus", data)
-        # return Point("litros") \
-        #     .tag("identificacion", self.name) \
-        #     .field("nivel", self.nivel_combus) \
-        #     .time(datetime.utcnow(), WritePrecision.NS)
+        metrics_insert("nivel-combus", data)
 
     def reportar_tension(self):
         data = {'generador': self.name, 'tension': self.tension}
-        metrics_api("nivel-tension", data)
-        # return Point("volts") \
-        #     .tag("identificacion", self.name) \
-        #     .field("tension", self.tension) \
-        #     .time(datetime.utcnow(), WritePrecision.NS)
+        metrics_insert("nivel-tension", data)

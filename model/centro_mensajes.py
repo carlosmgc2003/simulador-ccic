@@ -2,7 +2,6 @@ import random
 from typing import List
 
 import simpy
-from influxdb_client import WriteApi
 from scipy.stats import beta
 
 from model import PUESTO_COMANDO, TIEMPO_OCIOSO
@@ -15,11 +14,11 @@ class CentroMensajes(Facilidad):
     """Clase que recibe coeficientes que modela los tiempos de servicio de procesamiento de mensajes.
     coeficientes : tuple = (p, q, a, b)"""
 
-    def __init__(self, environment: simpy.Environment, db_connection: WriteApi, enchufado_a: Generador,
+    def __init__(self, environment: simpy.Environment, enchufado_a: Generador,
                  facilidades_ccic=None,
                  coeficientes=(1.295, 1.902, 102.0, 720.0)):
         super(CentroMensajes, self).__init__(name="Centro de Mensajes", environment=environment,
-                                             db_connection=db_connection, enchufado_a=enchufado_a)
+                                             enchufado_a=enchufado_a)
         if facilidades_ccic is None:
             facilidades_ccic = []
         self.tiempo_ocioso = 0

@@ -1,6 +1,5 @@
 from random import random
 
-from influxdb_client import WriteApi
 from scipy.stats import norm
 
 from model import DESTINO_PROC_MM, DEMANDA, TIEMPO_OCIOSO, TIEMPO_RECUPERACION
@@ -12,9 +11,8 @@ from model.mensaje_militar import GeneradorMensajes
 class PuestoComando(Facilidad):
     """PuestoComando genera los mensajes salientes del CCIC y recibe los mensajes entrantes."""
 
-    def __init__(self, environment, db_connection: WriteApi, enchufado_a: Generador):
-        super(PuestoComando, self).__init__(name="Puesto Comando", environment=environment, db_connection=db_connection,
-                                            enchufado_a=enchufado_a)
+    def __init__(self, environment, enchufado_a: Generador):
+        super(PuestoComando, self).__init__(name="Puesto Comando", environment=environment, enchufado_a=enchufado_a)
         self.comandante = GeneradorMensajes()
 
     def generar_t_espera(self):

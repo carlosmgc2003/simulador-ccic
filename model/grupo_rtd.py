@@ -1,7 +1,6 @@
 
 from random import random
 
-from influxdb_client import WriteApi
 from scipy.stats import norm
 
 from model import DESTINO_PROC_MM, TIEMPO_OCIOSO, DEMANDA, TIEMPO_RECUPERACION
@@ -13,9 +12,8 @@ from model.mensaje_militar import GeneradorMensajes
 class GrupoRTD(Facilidad):
     """Cabina de radio transmision de datos que recibe los mensajes salientes del CCIC y los transmite y genera los mensajes entrantes."""
 
-    def __init__(self, environment, red: str, db_connection: WriteApi, enchufado_a: Generador):
-        super(GrupoRTD, self).__init__(name="Red " + red, environment=environment, db_connection=db_connection,
-                                       enchufado_a=enchufado_a)
+    def __init__(self, environment, red: str, enchufado_a: Generador):
+        super(GrupoRTD, self).__init__(name="Red " + red, environment=environment, enchufado_a=enchufado_a)
         self.operador = GeneradorMensajes()
 
     def generar_t_espera(self):
@@ -57,7 +55,3 @@ class GrupoRTD(Facilidad):
                     self.poner_fuera_servicio()
             self.tiene_alimentacion = self.generador.genera_electricidad()
             yield self.environment.timeout(TIEMPO_OCIOSO)
-
-    def registrar_mm(self):
-        # Debe hacerse el insert en la BD SQL
-        pass
