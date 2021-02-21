@@ -60,6 +60,6 @@ if __name__ == '__main__':
     environment.process(generador2.operar())
     environment.process(generador3.operar())
     environment.process(generador4.operar())
-    environment.run(until=3600 * 2)
+    environment.run(until=3600 // 4)
     events_clear("mens-mil")
     logging.info("Finalizó el programa")
