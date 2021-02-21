@@ -34,6 +34,7 @@ class CentroMensajes(Facilidad):
         while True:
             print(f'Turno de: {self.name}')
             self.reportar_long_cola()
+            self.reportar_estado_servicio()
             if self.generador.genera_electricidad():
                 if not self.tiene_alimentacion:
                     self.poner_en_servicio()

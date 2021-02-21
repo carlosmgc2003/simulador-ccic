@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     t_recorrido_estaf = 30
 
-    environment = simpy.RealtimeEnvironment(factor=2.0)
+    environment = simpy.RealtimeEnvironment(factor=0.5, strict=False)
     generador1 = Generador(environment=environment, name="Generador CMD", capacidad_combus=CAPACIDAD,
                            consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE)
     generador2 = Generador(environment=environment, name="Generador Redes Ext", capacidad_combus=CAPACIDAD,

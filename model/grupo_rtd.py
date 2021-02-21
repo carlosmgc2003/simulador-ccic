@@ -42,6 +42,7 @@ class GrupoRTD(Facilidad):
             print(f'Turno de: {self.name}')
             probabilidad_trafico = random()
             self.reportar_long_cola()
+            self.reportar_estado_servicio()
             if self.generador.genera_electricidad():
                 if not self.tiene_alimentacion:
                     self.poner_en_servicio()

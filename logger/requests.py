@@ -8,21 +8,25 @@ config = configparser.ConfigParser()
 config.read("config.ini")
 metrics_url = config['api-horus']['url_metricas']
 events_url = config['api-horus']['url_eventos']
+bearer_token = config['api-horus']['bearer_token']
 
+headers = {"Authorization": "Bearer " + bearer_token}
 
 def api_post(url: str, endpoint: str, body: str):
+
     try:
-        r = requests.post(url + endpoint, data=body, timeout=0.1)
+        r = requests.post(url + endpoint, data=body, timeout=0.1, headers=headers)
     except requests.exceptions.Timeout:
         print("Se agoto el tiempo de espera...")
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.ConnectionError as e:
         print("Problema con la conexion... Abortando...")
+        print(e)
         exit(1)
 
 
 def api_delete(url: str, endpoint: str):
     try:
-        r = requests.delete(url + endpoint, timeout=0.1)
+        r = requests.delete(url + endpoint, timeout=0.1, headers=headers)
     except requests.exceptions.Timeout:
         print("Se agoto el tiempo de espera...")
     except requests.exceptions.ConnectionError:
