@@ -6,9 +6,15 @@
 
 Este software genera eventos tipicos de la operacion de los CCIC de campaña y los permite ingresar a una instancia de
 InfluxDB.
-`TODO: Que los ingrese a una API Horus`
-> Para tener una instancia de influx en docker:
-`docker run --name influxdb -p 8086:8086 quay.io/influxdb/influxdb:v2.0.3`
+
+### Instalación
+
+```bash
+sudo apt install python3-virtualenv
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
 ### Buckets de eventos necesarios hasta ahora
 
