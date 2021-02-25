@@ -1,4 +1,6 @@
 import logging
+import argparse
+
 
 import simpy
 
@@ -19,12 +21,23 @@ CONSUMO_COMBUS = (
                          1.0 / 3600) * TIEMPO_OCIOSO  # 1 litro sobre 3600 segundos (hora) por TIEMPO_OCIOSO (menor unidad de resolucion de tiempo)
 NIVEL_COMBUSTIBLE = 6.0
 
+parser = argparse.ArgumentParser()
+parser.add_argument("tiempo", type=int,help="cantidad en segundos que dura la corrida de simulacion de ccic (tiempo > 0)")
+parser.add_argument("--factor",type=float, default=1, help="factor de duracion de un tick de simulacion. Default: 1 (factor > 0.0)")
+args = parser.parse_args()
+if args.tiempo <= 0:
+    logging.error("No puede ser negativo ni cero el tiempo de simulacion")
+    exit(-1)
+if args.factor <= 0.0:
+    logging.error("No puede ser negativo ni cero el factor de tick de simulacion")
+    exit(-1)
+
 if __name__ == '__main__':
     logging.info("Inició el programa")
 
     t_recorrido_estaf = 30
 
-    environment = simpy.RealtimeEnvironment(factor=0.5, strict=False)
+    environment = simpy.RealtimeEnvironment(factor=args.factor, strict=False)
     generador1 = Generador(environment=environment, name="Generador CMD", capacidad_combus=CAPACIDAD,
                            consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE)
     generador2 = Generador(environment=environment, name="Generador Redes Ext", capacidad_combus=CAPACIDAD,
@@ -60,6 +73,6 @@ if __name__ == '__main__':
     environment.process(generador2.operar())
     environment.process(generador3.operar())
     environment.process(generador4.operar())
-    environment.run(until=3600 // 4)
+    environment.run(until=args.tiempo)
     events_clear("mens-mil")
     logging.info("Finalizó el programa")

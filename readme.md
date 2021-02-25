@@ -19,10 +19,13 @@ source venv/bin/activate
 ### Utilizacion
 Verificar que el archivo config.ini contenga las variables correctas para la instancia del sistema Horus que se encuentra en ejecucion.
 ```bash
-(venv) python simular.py
+(venv) python simular.py 3600
 ```
-El sistema correra un ciclo completo y finalmente vaciara los mensajes insertados en la BD Eventos.
-
+Para simular una hora de operacion del CCIC. El sistema correra un ciclo completo y finalmente vaciara los mensajes insertados en la BD Eventos.
+Para incrementar la "densidad" de eventos se puede utilizar opcionalmente un factor de duracion del tick de simulacion.
+```bash
+(venv) python simular.py 3600 --factor 0.5
+```
 
 ### TODO List
 
