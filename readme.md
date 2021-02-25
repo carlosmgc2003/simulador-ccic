@@ -4,8 +4,7 @@
 
 ### Simulador de eventos de Centros de Comunicaciones e Informática de Campaña
 
-Este software genera eventos tipicos de la operacion de los CCIC de campaña y los permite ingresar a una instancia de
-InfluxDB.
+Este software genera eventos tipicos de la operacion de los CCIC de campaña y los permite ingresar a una instancia de contenedores del sistema Horus - Tablero de control
 
 ### Instalación
 
