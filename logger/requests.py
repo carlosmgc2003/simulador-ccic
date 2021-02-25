@@ -9,6 +9,8 @@ config.read("config.ini")
 metrics_url = config['api-horus']['url_metricas']
 events_url = config['api-horus']['url_eventos']
 token_url = config['api-horus']['url_token']
+grafana_user = config['api-horus']['grafana_user']
+grafana_pass = config['api-horus']['grafana_pass']
 
 
 def get_bearer_token():
@@ -16,13 +18,15 @@ def get_bearer_token():
         r = requests.get("https://localhost/v1/token/list?user=admin&pass=admin", timeout=0.1, verify=False)
         if r.status_code == 200:
             json_response = r.json()
-            token_simulador = json_response["simulador"]
-            if len(token_simulador) == 32:
-                return token_simulador
-        r = requests.get('https://localhost/v1/token/generate?user=admin&pass=admin&device=simulador', timeout=0.1, verify=False)
-        if r.status_code == 200:
-            json_response = r.json()
-            return json_response["token"]
+            try:
+                token_simulador = json_response["simulador"]
+                if len(token_simulador) == 32:
+                    return token_simulador
+            except KeyError:
+                r = requests.get('https://localhost/v1/token/generate?user=admin&pass=admin&device=simulador', timeout=0.1, verify=False)
+                if r.status_code == 200:
+                    json_response = r.json()
+                    return json_response["token"]
     except requests.exceptions.Timeout:
         print("Se agoto el tiempo de espera...")
         exit(1)

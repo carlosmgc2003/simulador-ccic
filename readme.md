@@ -10,21 +10,24 @@ InfluxDB.
 ### Instalación
 
 ```bash
+git clone https://bitbucket.org/proyecto-horus/simulador-ccic.git
+cd simulador-ccic
 sudo apt install python3-virtualenv
 virtualenv venv
 source venv/bin/activate
-pip install -r requirements.txt
+(venv) pip install -r requirements.txt
 ```
+### Utilizacion
+Verificar que el archivo config.ini contenga las variables correctas para la instancia del sistema Horus que se encuentra en ejecucion.
+```bash
+(venv) python simular.py
+```
+El sistema correra un ciclo completo y finalmente vaciara los mensajes insertados en la BD Eventos.
 
-### Buckets de eventos necesarios hasta ahora
-
-- cola-cmd
-- mensajes-ccic
-- gpos-rtef
 
 ### TODO List
 
-- [ ] Reportar a una API Horus.
+- [X] Reportar a una API Horus.
 - [ ] Generar datos de Sensores (V, A, Prescencia, Humo)
-- [ ] Reportar F/S y E/S.
+- [X] Reportar F/S y E/S.
 - [ ] Rechazar mensajes de acuerdo al estado de servicio.
