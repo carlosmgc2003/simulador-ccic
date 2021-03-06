@@ -28,13 +28,18 @@ class CentroMensajes(Facilidad):
 
 
     def generar_t_espera(self):
-        return int(self.fdp.rvs() * (self.coeficientes[3] - self.coeficientes[2]) + self.coeficientes[2])
+        return int(self.fdp.rvs() * (self.coeficientes[3] - self.coeficientes[2]) + self.coeficientes[2]) // 10
+
+
+    def monitoreo_horus(self):
+        while True:
+            self.reportar_long_cola()
+            self.reportar_estado_servicio()
+            yield self.environment.timeout(TIEMPO_OCIOSO)
 
     def operar(self):
         while True:
             print(f'Turno de: {self.name}')
-            self.reportar_long_cola()
-            self.reportar_estado_servicio()
             if self.generador.genera_electricidad():
                 if not self.tiene_alimentacion:
                     self.poner_en_servicio()
@@ -50,6 +55,7 @@ class CentroMensajes(Facilidad):
             self.tiempo_ocioso += 5
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
+
     def procesar_mensaje(self, penalizacion: float = 1.0):
         """Generador de la acción del CM de procesar mensajes"""
         tservicio = self.generar_t_espera() * penalizacion  # Aca debe ir el tiempo de servicio real
@@ -60,6 +66,7 @@ class CentroMensajes(Facilidad):
         self.encaminar_mensaje(mensaje_en_proceso)
         mensaje_en_proceso.procedencia = self.name
         self.bandeja_salida.append(mensaje_en_proceso)
+        print(f'PROCESADO: {mensaje_en_proceso}')
         yield self.environment.process(self.operar())
 
     def encaminar_mensaje(self, mensaje: MensajeMilitar):

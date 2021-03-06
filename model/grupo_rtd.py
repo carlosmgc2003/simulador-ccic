@@ -17,7 +17,7 @@ class GrupoRTD(Facilidad):
         self.operador = GeneradorMensajes()
 
     def generar_t_espera(self):
-        return abs(norm.rvs() * TIEMPO_RECUPERACION)
+        return int(abs(norm.rvs() * TIEMPO_RECUPERACION + TIEMPO_RECUPERACION))
 
     def generar_mm(self):
         """ El GrupoRTD ingresa un mensaje al CCIC """
@@ -37,12 +37,17 @@ class GrupoRTD(Facilidad):
         yield self.environment.timeout(self.generar_t_espera())
         # Registrar el dato para la BDSQL
 
+
+    def monitoreo_horus(self):
+        while True:
+            self.reportar_long_cola()
+            self.reportar_estado_servicio()
+            yield self.environment.timeout(TIEMPO_OCIOSO)
+
     def operar(self):
         while True:
             print(f'Turno de: {self.name}')
             probabilidad_trafico = random()
-            self.reportar_long_cola()
-            self.reportar_estado_servicio()
             if self.generador.genera_electricidad():
                 if not self.tiene_alimentacion:
                     self.poner_en_servicio()
