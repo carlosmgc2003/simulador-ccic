@@ -34,18 +34,18 @@ if args.factor <= 0.0:
 
 if __name__ == '__main__':
     logging.info("Inició el programa")
-
+    events_clear("mens-mil")
     t_recorrido_estaf = 30
 
     environment = simpy.RealtimeEnvironment(factor=args.factor, strict=False)
     generador1 = Generador(environment=environment, name="Generador CMD", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE)
+                           consumo_combus=CONSUMO_COMBUS, nivel_combus=1)
     generador2 = Generador(environment=environment, name="Generador Redes Ext", capacidad_combus=CAPACIDAD,
                            consumo_combus=CONSUMO_COMBUS, nivel_combus=2)
     generador3 = Generador(environment=environment, name="Generador Redes Int", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE)
+                           consumo_combus=CONSUMO_COMBUS, nivel_combus=3)
     generador4 = Generador(environment=environment, name="Generador PC", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=NIVEL_COMBUSTIBLE)
+                           consumo_combus=CONSUMO_COMBUS, nivel_combus=4)
 
     pc = PuestoComando(environment=environment, enchufado_a=generador4)
 
@@ -69,6 +69,12 @@ if __name__ == '__main__':
     environment.process(rtef3.operar())
     environment.process(rtef4.operar())
     environment.process(rtef5.operar())
+    environment.process(cm.monitoreo_horus())
+    environment.process(rtef1.monitoreo_horus())
+    environment.process(rtef2.monitoreo_horus())
+    environment.process(rtef3.monitoreo_horus())
+    environment.process(rtef4.monitoreo_horus())
+    environment.process(rtef5.monitoreo_horus())
     environment.process(generador1.operar())
     environment.process(generador2.operar())
     environment.process(generador3.operar())

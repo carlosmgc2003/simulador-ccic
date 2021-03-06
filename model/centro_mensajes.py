@@ -28,7 +28,14 @@ class CentroMensajes(Facilidad):
 
 
     def generar_t_espera(self):
-        return int(self.fdp.rvs() * (self.coeficientes[3] - self.coeficientes[2]) + self.coeficientes[2])
+        return int(self.fdp.rvs() * (self.coeficientes[3] - self.coeficientes[2]) + self.coeficientes[2]) // 10
+
+
+    def monitoreo_horus(self):
+        while True:
+            self.reportar_long_cola()
+            self.reportar_estado_servicio()
+            yield self.environment.timeout(TIEMPO_OCIOSO)
 
     def operar(self):
         while True:
@@ -60,6 +67,7 @@ class CentroMensajes(Facilidad):
         self.encaminar_mensaje(mensaje_en_proceso)
         mensaje_en_proceso.procedencia = self.name
         self.bandeja_salida.append(mensaje_en_proceso)
+        print(f'PROCESADO: {mensaje_en_proceso}')
         yield self.environment.process(self.operar())
 
     def encaminar_mensaje(self, mensaje: MensajeMilitar):
