@@ -21,26 +21,28 @@ class GrupoRTD(Facilidad):
 
     def generar_mm(self):
         """ El GrupoRTD ingresa un mensaje al CCIC """
-        nuevo_mm_saliente = self.operador.generar_mensaje()
-        nuevo_mm_saliente.destino = DESTINO_PROC_MM
-        nuevo_mm_saliente.procedencia = self.name
-        self.bandeja_salida.append(nuevo_mm_saliente)
+        nuevo_mm_entrante = self.operador.generar_mensaje()
+        nuevo_mm_entrante.destino = DESTINO_PROC_MM
+        nuevo_mm_entrante.procedencia = self.name
         # Lugar para poner el tiempo aleatorio de generacion de mensajes
         yield self.environment.timeout(self.generar_t_espera())
+        self.bandeja_salida.append(nuevo_mm_entrante)
+        self.reportar_evento_mm(mensaje=nuevo_mm_entrante, evento="recibido")
         # Registrar el dato para la BDSQL
 
     def transmitir_mm(self):
         """ Remover un mensaje de la bandeja de entrada y transmitirlo"""
-        mensaje = self.bandeja_entrada.pop(0)
-        print(f'{self.name}: TRANSMITIDO {mensaje}')
         # Lugar para poner el tiempo aleatorio de transmision de mensajes
         yield self.environment.timeout(self.generar_t_espera())
+        mensaje = self.bandeja_entrada.pop(0)
+        print(f'{self.name}: TRANSMITIDO {mensaje}')
+        self.reportar_evento_mm(mensaje=mensaje, evento="transmitido")
         # Registrar el dato para la BDSQL
 
 
     def monitoreo_horus(self):
         while True:
-            self.reportar_long_cola()
+            self.reportar_long_cola(len(self.bandeja_salida))
             self.reportar_estado_servicio()
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
@@ -54,6 +56,7 @@ class GrupoRTD(Facilidad):
                 # Actividades del Gpo Rtef
                 if probabilidad_trafico < DEMANDA:
                     yield self.environment.process(self.generar_mm())
+                print(len(self.bandeja_entrada))
                 if len(self.bandeja_entrada) > 0:
                     yield self.environment.process(self.transmitir_mm())
             else:
@@ -61,3 +64,5 @@ class GrupoRTD(Facilidad):
                     self.poner_fuera_servicio()
             self.tiene_alimentacion = self.generador.genera_electricidad()
             yield self.environment.timeout(TIEMPO_OCIOSO)
+
+

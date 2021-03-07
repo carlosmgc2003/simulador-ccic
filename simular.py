@@ -80,5 +80,5 @@ if __name__ == '__main__':
     environment.process(generador3.operar())
     environment.process(generador4.operar())
     environment.run(until=args.tiempo)
-    events_clear("mens-mil")
+    # events_clear("mens-mil")
     logging.info("Finalizó el programa")

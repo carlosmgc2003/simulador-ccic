@@ -3,6 +3,7 @@ import json
 import time
 
 import requests
+import urllib3
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -12,6 +13,7 @@ token_url = config['api-horus']['url_token']
 grafana_user = config['api-horus']['grafana_user']
 grafana_pass = config['api-horus']['grafana_pass']
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def get_bearer_token():
     try:

@@ -22,8 +22,9 @@ class PuestoComando(Facilidad):
         nuevo_mm_saliente = self.comandante.generar_mensaje()
         nuevo_mm_saliente.destino = DESTINO_PROC_MM
         nuevo_mm_saliente.procedencia = self.name
-        self.bandeja_salida.append(nuevo_mm_saliente)
         yield self.environment.timeout(self.generar_t_espera())
+        self.bandeja_salida.append(nuevo_mm_saliente)
+        self.reportar_evento_mm(mensaje=nuevo_mm_saliente, evento="generado")
 
     def operar(self):
         while True:

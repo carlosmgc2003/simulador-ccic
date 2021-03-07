@@ -33,7 +33,7 @@ class CentroMensajes(Facilidad):
 
     def monitoreo_horus(self):
         while True:
-            self.reportar_long_cola()
+            self.reportar_long_cola(len(self.bandeja_entrada))
             self.reportar_estado_servicio()
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
@@ -59,14 +59,14 @@ class CentroMensajes(Facilidad):
     def procesar_mensaje(self, penalizacion: float = 1.0):
         """Generador de la acción del CM de procesar mensajes"""
         tservicio = self.generar_t_espera() * penalizacion  # Aca debe ir el tiempo de servicio real
-        mensaje_en_proceso: MensajeMilitar = self.bandeja_entrada.pop(0)
         # Agregar el registro del procesamiento en el mensaje
         yield self.environment.timeout(tservicio)
+        mensaje_en_proceso: MensajeMilitar = self.bandeja_entrada.pop(0)
+        self.reportar_evento_mm(mensaje=mensaje_en_proceso, evento="procesado")
         # Escribir el nuevo destino en el mensaje (Por ahora todos al PC)
         self.encaminar_mensaje(mensaje_en_proceso)
         mensaje_en_proceso.procedencia = self.name
         self.bandeja_salida.append(mensaje_en_proceso)
-        print(f'PROCESADO: {mensaje_en_proceso}')
         yield self.environment.process(self.operar())
 
     def encaminar_mensaje(self, mensaje: MensajeMilitar):
@@ -75,3 +75,4 @@ class CentroMensajes(Facilidad):
             mensaje.destino = random.choice(nombres_facilidades)
         else:
             mensaje.destino = PUESTO_COMANDO
+
