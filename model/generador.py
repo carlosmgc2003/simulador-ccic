@@ -42,7 +42,7 @@ class Generador(Actor):
         return self.encendido
 
     def reportar_nivel(self):
-        data = {'generador': self.name, 'nivel': self.nivel_combus}
+        data = {'generador': self.name, 'nivel': self.nivel_combus, 'capacidad': self.capacidad_combus}
         metrics_insert("nivel-combus", data)
 
     def reportar_tension(self):
