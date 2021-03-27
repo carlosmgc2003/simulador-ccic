@@ -56,7 +56,6 @@ class GrupoRTD(Facilidad):
                 # Actividades del Gpo Rtef
                 if probabilidad_trafico < DEMANDA:
                     yield self.environment.process(self.generar_mm())
-                print(len(self.bandeja_entrada))
                 if len(self.bandeja_entrada) > 0:
                     yield self.environment.process(self.transmitir_mm())
             else:
