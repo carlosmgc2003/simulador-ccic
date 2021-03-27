@@ -17,7 +17,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def get_bearer_token():
     try:
-        r = requests.get("https://localhost/v1/token/list?user=admin&pass=admin", timeout=0.1, verify=False)
+        r = requests.get(f'{token_url}list?user={grafana_user}&pass={grafana_pass}', timeout=10, verify=False)
         if r.status_code == 200:
             json_response = r.json()
             try:
@@ -25,7 +25,7 @@ def get_bearer_token():
                 if len(token_simulador) == 32:
                     return token_simulador
             except KeyError:
-                r = requests.get('https://localhost/v1/token/generate?user=admin&pass=admin&device=simulador', timeout=0.1, verify=False)
+                r = requests.get(f'{token_url}generate?user={grafana_user}&pass={grafana_pass}&device=simulador', timeout=10, verify=False)
                 if r.status_code == 200:
                     json_response = r.json()
                     return json_response["token"]
@@ -44,7 +44,7 @@ headers = {"Authorization": "Bearer " + bearer_token}
 
 def api_post(url: str, endpoint: str, body: str):
     try:
-        r = requests.post(url + endpoint, data=body, timeout=0.1, headers=headers, verify=False)
+        r = requests.post(url + endpoint, data=body, timeout=10, headers=headers, verify=False)
     except requests.exceptions.Timeout:
         print("Se agoto el tiempo de espera...")
     except requests.exceptions.ConnectionError as e:
@@ -55,7 +55,7 @@ def api_post(url: str, endpoint: str, body: str):
 
 def api_delete(url: str, endpoint: str):
     try:
-        r = requests.delete(url + endpoint, timeout=0.1, headers=headers, verify=False)
+        r = requests.delete(url + endpoint, timeout=10, headers=headers, verify=False)
     except requests.exceptions.Timeout:
         print("Se agoto el tiempo de espera...")
     except requests.exceptions.ConnectionError:
