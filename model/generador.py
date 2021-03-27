@@ -18,6 +18,7 @@ class Generador(Actor):
         self.nivel_combus = nivel_combus
         self.encendido = False
         self.tension = 0.0
+        self.corriente = 0.0
 
     def consumir_combustible(self):
         if self.nivel_combus > 0.0:
@@ -25,26 +26,32 @@ class Generador(Actor):
             self.nivel_combus -= disminucion
             self.encendido = True
             self.tension = random.normalvariate(TENSION, DESV_STD_TENSION)
+            self.corriente = random.normalvariate(self.corriente, 0.01)
         else:
             self.nivel_combus = 0.0
             self.encendido = False
             self.tension = 0.0
+            self.corriente = 0.0
 
     def operar(self):
         while True:
             print(f'Turno de: {self.name}')
             self.consumir_combustible()
             self.reportar_nivel()
-            self.reportar_tension()
+            self.reportar_alimentacion()
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
     def genera_electricidad(self):
         return self.encendido
 
+    def conectar_cabina(self):
+        self.corriente += 1.0
+        return self
+
     def reportar_nivel(self):
         data = {'generador': self.name, 'nivel': self.nivel_combus, 'capacidad': self.capacidad_combus}
         metrics_insert("nivel-combus", data)
 
-    def reportar_tension(self):
-        data = {'generador': self.name, 'tension': self.tension}
-        metrics_insert("nivel-tension", data)
+    def reportar_alimentacion(self):
+        data = {'generador': self.name, 'tension': self.tension, 'corriente': self.corriente}
+        metrics_insert("alimentacion", data)

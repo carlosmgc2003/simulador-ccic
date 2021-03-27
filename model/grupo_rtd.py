@@ -44,6 +44,7 @@ class GrupoRTD(Facilidad):
         while True:
             self.reportar_long_cola(len(self.bandeja_salida))
             self.reportar_estado_servicio()
+            self.reportar_sensores_bool()
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
     def operar(self):

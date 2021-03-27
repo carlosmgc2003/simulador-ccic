@@ -18,7 +18,7 @@ class Facilidad(Actor):
         self.bandeja_entrada: List[MensajeMilitar] = []
         self.bandeja_salida: List[MensajeMilitar] = []
         self.escribiente: simpy.Resource = simpy.Resource(environment, 1)
-        self.generador = enchufado_a
+        self.generador = enchufado_a.conectar_cabina()
         self.estado = ESTADOS[2]
         self.tiene_alimentacion = False
 
@@ -49,6 +49,12 @@ class Facilidad(Actor):
     def reportar_estado_servicio(self):
         data = {"facilidad": self.name, "estado": self.estado}
         metrics_insert("estado-servicio", data)
+
+    def reportar_sensores_bool(self):
+        rain_sensor = {"facilidad": self.name, "evento": "rain", "valor": False}
+        events_insert("sensor_bool", rain_sensor)
+        presence_sensor = {"facilidad": self.name, "evento": "presence", "valor": True}
+        events_insert("sensor_bool", presence_sensor)
 
     def reportar_long_cola(self, long: int):
         data = {"facilidad": self.name, "long_cola": long}
