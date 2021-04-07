@@ -40,7 +40,7 @@ class GeneradorMensajes:
     """Clase que construye mensajes nuevos cuyos atributos son elegidos al azar. (Con distribucion de probabilidad
     constante"""
     precedencias = "rutina prioridad inmediato flash".split()
-    clasificaciones = "público reservado confidencial secreto".split()
+    clasificaciones = "publico reservado confidencial secreto".split()
 
     def __init__(self):
         pass

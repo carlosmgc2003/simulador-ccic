@@ -49,10 +49,12 @@ class GrupoRTD(Facilidad):
 
     def operar(self):
         while True:
-            print(f'Turno de: {self.name}')
+            electricidad = self.generador.genera_electricidad()
+            print(f'Turno de: {self.name} {self.estado}')
             probabilidad_trafico = random()
-            if self.generador.genera_electricidad():
+            if electricidad:
                 if not self.tiene_alimentacion:
+                    #print("ME PUSE EN SERVICIO")
                     self.poner_en_servicio()
                 # Actividades del Gpo Rtef
                 if probabilidad_trafico < DEMANDA:
@@ -61,8 +63,9 @@ class GrupoRTD(Facilidad):
                     yield self.environment.process(self.transmitir_mm())
             else:
                 if self.tiene_alimentacion:
+                    #print("ME PUSE FUERA DE SERVICIO")
                     self.poner_fuera_servicio()
-            self.tiene_alimentacion = self.generador.genera_electricidad()
+            self.tiene_alimentacion = electricidad
             yield self.environment.timeout(TIEMPO_OCIOSO)
 
 

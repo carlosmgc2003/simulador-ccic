@@ -21,13 +21,14 @@ class Generador(Actor):
         self.corriente = 0.0
 
     def consumir_combustible(self):
-        if self.nivel_combus > 0.0:
+        if self.nivel_combus > self.consumo_combus:
             disminucion = abs(random.normalvariate(self.consumo_combus, DESV_STD_CONS_COMBUS))
             self.nivel_combus -= disminucion
             self.encendido = True
             self.tension = random.normalvariate(TENSION, DESV_STD_TENSION)
             self.corriente = random.normalvariate(self.corriente, 0.01)
         else:
+            print(f'{self.name}: ME QUEDE SIN COMBUSTIBLE!')
             self.nivel_combus = 0.0
             self.encendido = False
             self.tension = 0.0

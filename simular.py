@@ -33,52 +33,57 @@ if args.factor <= 0.0:
     exit(-1)
 
 if __name__ == '__main__':
-    logging.info("Inició el programa")
-    events_clear("mens-mil")
-    t_recorrido_estaf = 30
+    try:
+        logging.info("Inició el programa")
+        events_clear("mens-mil")
+        t_recorrido_estaf = 30
 
-    environment = simpy.RealtimeEnvironment(factor=args.factor, strict=False)
-    generador1 = Generador(environment=environment, name="Generador CMD", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=1)
-    generador2 = Generador(environment=environment, name="Generador Redes Ext", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=2)
-    generador3 = Generador(environment=environment, name="Generador Redes Int", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=3)
-    generador4 = Generador(environment=environment, name="Generador PC", capacidad_combus=CAPACIDAD,
-                           consumo_combus=CONSUMO_COMBUS, nivel_combus=4)
+        environment = simpy.RealtimeEnvironment(factor=args.factor, strict=False)
+        generador1 = Generador(environment=environment, name="Generador CMD", capacidad_combus=CAPACIDAD,
+                            consumo_combus=CONSUMO_COMBUS, nivel_combus=2)
+        generador2 = Generador(environment=environment, name="Generador Redes Ext", capacidad_combus=CAPACIDAD,
+                            consumo_combus=CONSUMO_COMBUS, nivel_combus=0.01)
+        generador3 = Generador(environment=environment, name="Generador Redes Int", capacidad_combus=CAPACIDAD,
+                            consumo_combus=CONSUMO_COMBUS, nivel_combus=3)
+        generador4 = Generador(environment=environment, name="Generador PC", capacidad_combus=CAPACIDAD,
+                            consumo_combus=CONSUMO_COMBUS, nivel_combus=4)
 
-    pc = PuestoComando(environment=environment, enchufado_a=generador4)
+        pc = PuestoComando(environment=environment, enchufado_a=generador4)
 
-    rtef1 = GrupoRTD(environment, "Cdo Op", enchufado_a=generador3)
-    rtef2 = GrupoRTD(environment, "Mat Pers", enchufado_a=generador3)
-    rtef3 = GrupoRTD(environment, "Icia", enchufado_a=generador3)
-    rtef4 = GrupoRTD(environment, "Cdo", enchufado_a=generador2)
-    rtef5 = GrupoRTD(environment, "Op", enchufado_a=generador2)
-    cm = CentroMensajes(environment, facilidades_ccic=[rtef1, rtef2, rtef3, rtef4, rtef5], enchufado_a=generador1)
+        rtef1 = GrupoRTD(environment, "Cdo Op", enchufado_a=generador3)
+        rtef2 = GrupoRTD(environment, "Mat Pers", enchufado_a=generador3)
+        rtef3 = GrupoRTD(environment, "Icia", enchufado_a=generador3)
+        rtef4 = GrupoRTD(environment, "Cdo", enchufado_a=generador2)
+        rtef5 = GrupoRTD(environment, "Op", enchufado_a=generador2)
+        cm = CentroMensajes(environment, facilidades_ccic=[rtef1, rtef2, rtef3, rtef4, rtef5], enchufado_a=generador1)
 
-    estafeta_pc = EstafetaConstante(environment, recorrido=[pc, cm], tiempo=t_recorrido_estaf)
-    estafeta_local = EstafetaConstante(environment, recorrido=[rtef1, rtef2, rtef3, rtef4, rtef5, cm],
-                                       tiempo=t_recorrido_estaf // 5)
+        estafeta_pc = EstafetaConstante(environment, recorrido=[pc, cm], tiempo=t_recorrido_estaf)
+        estafeta_local = EstafetaConstante(environment, recorrido=[rtef1, rtef2, rtef3, rtef4, rtef5, cm],
+                                        tiempo=t_recorrido_estaf // 5)
 
-    environment.process(pc.operar())
-    environment.process(estafeta_pc.operar())
-    environment.process(estafeta_local.operar())
-    environment.process(cm.operar())
-    environment.process(rtef1.operar())
-    environment.process(rtef2.operar())
-    environment.process(rtef3.operar())
-    environment.process(rtef4.operar())
-    environment.process(rtef5.operar())
-    environment.process(cm.monitoreo_horus())
-    environment.process(rtef1.monitoreo_horus())
-    environment.process(rtef2.monitoreo_horus())
-    environment.process(rtef3.monitoreo_horus())
-    environment.process(rtef4.monitoreo_horus())
-    environment.process(rtef5.monitoreo_horus())
-    environment.process(generador1.operar())
-    environment.process(generador2.operar())
-    environment.process(generador3.operar())
-    environment.process(generador4.operar())
-    environment.run(until=args.tiempo)
-    # events_clear("mens-mil")
-    logging.info("Finalizó el programa")
+        environment.process(pc.operar())
+        environment.process(estafeta_pc.operar())
+        environment.process(estafeta_local.operar())
+        environment.process(cm.operar())
+        environment.process(rtef1.operar())
+        environment.process(rtef2.operar())
+        environment.process(rtef3.operar())
+        environment.process(rtef4.operar())
+        environment.process(rtef5.operar())
+        environment.process(cm.monitoreo_horus())
+        environment.process(rtef1.monitoreo_horus())
+        environment.process(rtef2.monitoreo_horus())
+        environment.process(rtef3.monitoreo_horus())
+        environment.process(rtef4.monitoreo_horus())
+        environment.process(rtef5.monitoreo_horus())
+        environment.process(generador1.operar())
+        environment.process(generador2.operar())
+        environment.process(generador3.operar())
+        environment.process(generador4.operar())
+        environment.run(until=args.tiempo)
+        
+        events_clear("mens-mil")
+        logging.info("Finalizó el programa")
+    except KeyboardInterrupt:
+        events_clear("mens-mil")
+        logging.info("Finalizó el programa prematuramente")

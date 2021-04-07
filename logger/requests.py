@@ -45,12 +45,15 @@ headers = {"Authorization": "Bearer " + bearer_token}
 def api_post(url: str, endpoint: str, body: str):
     try:
         r = requests.post(url + endpoint, data=body, timeout=10, headers=headers, verify=False)
+        #print(r.json())
     except requests.exceptions.Timeout:
         print("Se agoto el tiempo de espera...")
     except requests.exceptions.ConnectionError as e:
         print("Problema con la conexion... Abortando...")
         print(e)
         exit(1)
+    except json.decoder.JSONDecodeError:
+        print("No hay contenido en la response")
 
 
 def api_delete(url: str, endpoint: str):

@@ -7,7 +7,7 @@ from .actor import Actor
 from .generador import Generador
 from .mensaje_militar import MensajeMilitar
 
-ESTADOS = ["en servicio", "servicio limitado", "fuera servicio"]
+ESTADOS = ["en servicio", "servicio limitado", "fuera de servicio"]
 
 class Facilidad(Actor):
     """Facilidad es una clase abstracta que reune las abstracciones en comun de las facilidades del CCIC, relacionadas
@@ -28,7 +28,7 @@ class Facilidad(Actor):
             if mensaje.destino == self.name:
                 self.bandeja_entrada.append(estafeta.entregar_mensaje(mensaje))
                 self.reportar_evento_mm(mensaje=mensaje, evento="recibido_estafeta")
-                print(f'{self.name} RECIBIDO: {mensaje}')
+                #print(f'{self.name} RECIBIDO: {mensaje}')
 
     def entregar_mm(self, estafeta):
         bandeja_salida = self.bandeja_salida.copy()
@@ -36,7 +36,7 @@ class Facilidad(Actor):
             if mensaje.destino in list(map(lambda x: x.name, estafeta.recorrido)):
                 self.bandeja_salida.remove(estafeta.recoger_mensaje(mensaje))
                 self.reportar_evento_mm(mensaje=mensaje, evento="entregado_estafeta")
-                print(f'{self.name} ENTREGADO: {mensaje}')
+                #print(f'{self.name} ENTREGADO: {mensaje}')
 
     def poner_en_servicio(self):
         self.estado = ESTADOS[0]
@@ -61,5 +61,4 @@ class Facilidad(Actor):
         metrics_insert("longitud-cola", data)
 
     def reportar_evento_mm(self, mensaje: MensajeMilitar, evento: str):
-        print("Mensaje")
         events_insert("mens-mil", mensaje.to_dict(evento))
